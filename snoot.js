@@ -124,6 +124,10 @@ function validateForm(evt) {
        evt.returnValue = false;
     }
     
+    validateAddress("billingAddress");
+    
+    validateAddress("deliveryAddress");
+    
     if (formValidity === true) {
         document.getElementById("errorText").innerHTML = "";
         document.getElementById("errorText").style.display = "none";
@@ -133,6 +137,52 @@ function validateForm(evt) {
         document.getElementById("errorText").style.display = "block";
         scroll(0,0);
     }
+}
+
+// Function to validate address
+
+function validateAddress(fieldsetId) {
+    var inputElements = document.querySelectorAll("#" + fieldsetId + " input");
+    var errorDiv = document.querySelectorAll("#" + fieldsetId + " .errorMessage")[0];
+    var fieldsetValidity = true;
+    var elementCount = inputElements.length;
+    var currentElement = null;
+    
+    try {
+        // Loop required input elements
+        for(var i = 0; i < elementCount; i++) {
+            currentElement = inputElements[i];
+            
+            // Test for blank
+            alert(currentElement);
+            if (currentElement.value === "") {
+                currentElement.style.background = "rgb(255, 233, 233)";
+                fieldsetValidity = false;
+            } else {
+                currentElement.style.background = "white";
+            }
+            
+        }
+        if (fieldsetValidity === false) {
+            if (fieldsetId === "billingAddress") {
+                throw "Please complete all Billing Address information";
+            }
+            else {
+                throw "Please complete all Delivery Address information";
+            }
+        }
+        else {
+            errorDiv.style.display = "none";
+            errorDiv.innerHTML = "";
+        }
+        
+    }
+    catch (msg) {
+        errorDiv.style.display = "block";
+        errorDiv.innerHTML = msg;
+        formValidity = false;
+    }
+    
 }
 
 
@@ -148,7 +198,7 @@ function setUpPage() {
 
 function createEventListeners() {
 
-    // Event listeners for Month select list
+    // Event listeners for month select list
 
     var deliveryMonth = document.getElementById("delivMo");
     if (deliveryMonth.addEventListener) {
