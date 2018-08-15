@@ -47,10 +47,10 @@ function updateDays() {
     var deliveryMonth = document.getElementById("delivMo");
     var deliveryYear = document.getElementById("delivYr");
     if (deliveryMonth.selectedIndex === -1) {
-        return;    
+        return;
     }
     var selectedMonth = deliveryMonth.options[deliveryMonth.selectedIndex].value;
-    
+
 
 
     while (dates[28]) {
@@ -122,18 +122,22 @@ function copyBillingAddress() {
 // Function to validate entire form
 
 function validateForm(evt) {
-    if(evt.preventDefault) {
-       evt.preventDefault();
+    if (evt.preventDefault) {
+        evt.preventDefault();
     } else {
-       evt.returnValue = false;
+        evt.returnValue = false;
     }
-    
+
     validateAddress("billingAddress");
-    
+
     validateAddress("deliveryAddress");
-    
+
     validateDeliveryDate();
-    
+
+    validatePayment();
+
+    validateMessage();
+
     if (formValidity === true) {
         document.getElementById("errorText").innerHTML = "";
         document.getElementById("errorText").style.display = "none";
@@ -141,7 +145,7 @@ function validateForm(evt) {
     } else {
         document.getElementById("errorText").innerHTML = "Please fix the indicated problems and then resubmit your order";
         document.getElementById("errorText").style.display = "block";
-        scroll(0,0);
+        scroll(0, 0);
     }
 }
 
@@ -153,12 +157,12 @@ function validateAddress(fieldsetId) {
     var fieldsetValidity = true;
     var elementCount = inputElements.length;
     var currentElement = null;
-    
+
     try {
         // Loop required input elements
-        for(var i = 0; i < elementCount; i++) {
+        for (var i = 0; i < elementCount; i++) {
             currentElement = inputElements[i];
-            
+
             // Test for blank
             if (currentElement.value === "") {
                 currentElement.style.background = "rgb(255, 233, 233)";
@@ -166,45 +170,41 @@ function validateAddress(fieldsetId) {
             } else {
                 currentElement.style.background = "white";
             }
-            
+
         }
-        
+
         // Validate select listeners
-        
+
         currentElement = document.querySelectorAll("#" + fieldsetId + " select")[0];
-        
+
         // Blank
-        
+
         if (currentElement.selectedIndex === -1) {
             currentElement.style.border = "1px solid red";
             fieldsetValidity = false;
         }
         // Valid
-        
         else {
             currentElement.style.border = "white";
         }
-        
+
         if (fieldsetValidity === false) {
             if (fieldsetId === "billingAddress") {
                 throw "Please complete all Billing Address information";
-            }
-            else {
+            } else {
                 throw "Please complete all Delivery Address information";
             }
-        }
-        else {
+        } else {
             errorDiv.style.display = "none";
             errorDiv.innerHTML = "";
         }
-        
-    }
-    catch (msg) {
+
+    } catch (msg) {
         errorDiv.style.display = "block";
         errorDiv.innerHTML = msg;
         formValidity = false;
     }
-    
+
 }
 
 // Function to validate delivery date
@@ -215,57 +215,150 @@ function validateDeliveryDate() {
     var fieldsetValidity = true;
     var elementCount = selectElements.length;
     var currentElement = null;
-    
+
     try {
         // Loop required select elements
-        for(var i = 0; i < elementCount; i++) {
-            alert(i);
+        for (var i = 0; i < elementCount; i++) {
             currentElement = selectElements[i];
-            
+
             // Test for blank
-            
+
             if (currentElement.selectedIndex === -1) {
                 currentElement.style.border = "1px solid red";
                 fieldsetValidity = false;
             } else {
                 currentElement.style.border = "";
             }
-            
+
         }
-        
+
         // Validate select listeners
-        
+
         currentElement = document.querySelectorAll("#deliveryDate" + " select")[0];
-        
+
         // Blank
-        
+
         if (currentElement.selectedIndex === -1) {
             currentElement.style.border = "1px solid red";
             fieldsetValidity = false;
         }
         // Valid
-        
         else {
             currentElement.style.border = "";
         }
-    
+
         if (fieldsetValidity === false) {
             throw "Please specify a delivery date";
-        }
-        
-        else {
+        } else {
             errorDiv.style.display = "none";
             errorDiv.innerHTML = "";
         }
-        
-    }
-    catch (msg) {
+
+    } catch (msg) {
         errorDiv.style.display = "block";
         errorDiv.innerHTML = msg;
         formValidity = false;
     }
 }
 
+// Function to validate payment
+
+function validatePayment() {
+    var errorDiv = document.querySelectorAll("#paymentInfo" + " .errorMessage")[0];
+    var fieldsetValidity = true;
+
+    // Get radio buttons
+
+    var cards = document.getElementsByName("PaymentType");
+    var selectElements = document.querySelectorAll("#paymentInfo" + " select")
+    var ccNumElement = document.getElementById("ccNum")
+    var elementCount = selectElements.length;
+    var cvvElement = document.getElementById("cvv")
+    var currentElement = null;
+
+    try {
+
+        // Check radio buttons for at least 1 required checked
+
+        if (!cards[0].checked && !cards[1].checked && !cards[2].checked && !cards[3].checked) {
+            for (var i = 0; i < cards.length; i++) {
+                cards[i].style.outline = "1px solid red";
+            }
+            fieldsetValidity = false;
+        } else {
+            for (var i = 0; i < cards.length; i++) {
+                cards[i].style.outline = "";
+            }
+        }
+
+        // Check for card number format
+
+        if (ccNumElement.value === "") {
+            ccNumElement.style.backgroundColor = "rgb(255, 233, 233)";
+            fieldsetValidity = false;
+        } else {
+            ccNumElement.style.backgroundColor = "white";
+        }
+
+        // Validate expiration date fields 
+
+        for (var i = 0; i < elementCount; i++) {
+            currentElement = selectElements[i]
+            if (currentElement.selectedIndex === -1) {
+                currentElement.style.border = "1px solid red";
+                fieldsetValidity = false;
+            } else {
+                currentElement.style.border = "";
+            }
+        }
+
+        // check cvv number
+
+        if (cvvElement.value === "") {
+            cvvElement.style.backgroundColor = "rgb(255, 233, 233)";
+            fieldsetValidity = false;
+        } else {
+            cvvElement.style.backgroundColor = "white";
+        }
+
+        if (fieldsetValidity === false) {
+            throw "Please complete all Payment info.";
+        } else {
+            errorDiv.style.display = "none";
+            errorDiv.innerHTML = "";
+        }
+
+    } catch (msg) {
+        errorDiv.style.display = "block";
+        errorDiv.innerHTML = msg;
+        formValidity = false;
+    }
+}
+
+// Function to validate custom message
+
+function validateMessage() {
+    var msgBox = document.getElementById("customText");
+    var errorDiv = document.querySelectorAll("#message" + " .errorMessage")[0];
+    var fieldsetValidity = true;
+
+    try {
+
+        if (document.getElementById("custom").checked && ((msgBox.value === "") || (msgBox.value === msgBox.placeholder))) {
+            throw "Please enter your Custom Message text."
+        } else {
+            errorDiv.style.display = "none";
+            errorDiv.innerHTML = "";
+            msgBox.style.background = "white";
+        }
+
+    } catch (msg) {
+        errorDiv.style.display = "block";
+        errorDiv.innerHTML = msg;
+        msgBox.style.background = "rgb(255, 233, 233)"
+        formValidity = false;
+    }
+}
 
 // Function to run on page load
 
@@ -305,7 +398,7 @@ function createEventListeners() {
     } else if (messageBox.attachEvent) {
         messageBox.attachEvent("onchange", autoCheckCustom);
     }
-    
+
     // Event listener for checkbox to copy data 
 
     var same = document.getElementById("sameAddr");
@@ -314,9 +407,9 @@ function createEventListeners() {
     } else if (same.attachEvent) {
         same.attachEvent("onchange", copyBillingAddress);
     }
-    
+
     // Event listener for validation on form submission
-    
+
     var form = document.getElementsByTagName("form")[0];
     if (form.addEventListener) {
         form.addEventListener("submit", validateForm, false);
