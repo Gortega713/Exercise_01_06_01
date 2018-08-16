@@ -138,6 +138,8 @@ function validateForm(evt) {
 
     validateMessage();
 
+    validateCreateAccount();
+
     if (formValidity === true) {
         document.getElementById("errorText").innerHTML = "";
         document.getElementById("errorText").style.display = "none";
@@ -149,7 +151,7 @@ function validateForm(evt) {
     }
 }
 
-// Function to validate address
+// Function to validate address (Function is called inside of validateForm)
 
 function validateAddress(fieldsetId) {
     var inputElements = document.querySelectorAll("#" + fieldsetId + " input");
@@ -207,7 +209,7 @@ function validateAddress(fieldsetId) {
 
 }
 
-// Function to validate delivery date
+// Function to validate delivery date (Function is called inside of validateForm)
 
 function validateDeliveryDate() {
     var selectElements = document.querySelectorAll("#deliveryDate" + " select");
@@ -261,7 +263,7 @@ function validateDeliveryDate() {
     }
 }
 
-// Function to validate payment
+// Function to validate payment (Function is called inside of validateForm)
 
 function validatePayment() {
     var errorDiv = document.querySelectorAll("#paymentInfo" + " .errorMessage")[0];
@@ -335,7 +337,7 @@ function validatePayment() {
     }
 }
 
-// Function to validate custom message
+// Function to validate custom message (Function is called inside of validateForm)
 
 function validateMessage() {
     var msgBox = document.getElementById("customText");
@@ -357,6 +359,48 @@ function validateMessage() {
         errorDiv.innerHTML = msg;
         msgBox.style.background = "rgb(255, 233, 233)"
         formValidity = false;
+    }
+} // Function to validate create account (Function is called inside of validateForm)
+
+function validateCreateAccount() {
+    var errorDiv = document.querySelectorAll("#createAccount" + " .errorMessage")[0];
+    var usernameElement = document.getElementById("username");
+    var pass1Element = document.getElementById("pass1");
+    var pass2Element = document.getElementById("pass2");
+    usernameElement.style.background = "white";
+    pass1Element.style.background = "white";
+    pass2Element.style.background = "white";
+    var passwordMismatch = false;
+    var invColor = "rgb(255, 233, 233)"
+    var fieldsetValidity = true;
+
+
+
+    try {
+        // If there is data in the fields but the passwords are not matching
+        if (usernameElement.value !== "" && pass1Element.value !== "" && pass2Element.value !== "") {
+            if (pass1Element.value !== pass2Element.value) {
+                passwordMismatch = true;
+                throw "Passwords entered do not match, please re-enter.";
+            }
+        } else if (usernameElement.value === "" && pass1Element.value === "" && pass2Element.value === "") {
+            fieldsetValidity = true;
+        } else {
+            fieldsetValidity = false;
+            throw "Please enter all fields to Create Account.";
+        }
+
+    } catch (msg) {
+        errorDiv.style.display = "block";
+        errorDiv.innerHTML = msg;
+        pass1Element.style.background = invColor;
+        pass2Element.style.background = invColor;
+        formValidity = false;
+        if (passwordMismatch) {
+            usernameElement.style.background = "white";
+        } else {
+            usernameElement.style.background = invColor;
+        }
     }
 }
 
